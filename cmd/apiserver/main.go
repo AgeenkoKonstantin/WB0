@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"WB0/internal/apiserver"
