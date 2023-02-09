@@ -4,9 +4,10 @@ import (
 	"WB0/internal/models"
 	"encoding/json"
 	"fmt"
+	"github.com/go-faker/faker/v4"
+	"github.com/go-faker/faker/v4/pkg/options"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
-	"strconv"
 	"time"
 )
 
@@ -27,18 +28,12 @@ func (p *producer) Publish(subject string, data []byte) error {
 	return p.stanConn.Publish(subject, data)
 }
 
-// todo: add random order gen
 func (p *producer) Run() {
-
-	//test generation order
-	ID := 1
-	//
 	for {
-		order := &models.Order{
-			OrderUID: strconv.Itoa(ID),
+		order := &models.Order{}
+		if err := faker.FakeData(order, options.WithRandomMapAndSliceMaxSize(2)); err != nil {
+			p.logger.Info(err)
 		}
-		ID++
-
 		orderBytes, _ := json.Marshal(*order)
 
 		p.logger.Info("Publish new random order")
