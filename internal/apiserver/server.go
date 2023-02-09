@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"encoding/json"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -28,7 +29,12 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
+	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/orders/{id}", s.testGET).Methods("GET")
+}
+
+func (s *server) configureLogger() {
+
 }
 
 func (s *server) testGET(w http.ResponseWriter, r *http.Request) {

@@ -1,12 +1,13 @@
 package apiserver
 
 import (
+	"WB0/internal/config"
 	"database/sql"
 	_ "github.com/lib/pq"
 	"net/http"
 )
 
-func Start(config *Config) error {
+func Start(config *config.Config) error {
 	db, err := newDb(config.DatabaseURL)
 	if err != nil {
 		return err

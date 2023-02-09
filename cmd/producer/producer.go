@@ -1,10 +1,12 @@
 package main
 
 import (
-	"WB0/internal/apiserver"
 	"WB0/internal/config"
+	"WB0/internal/nats"
+	"WB0/internal/producer"
 	"flag"
 	"github.com/BurntSushi/toml"
+	"github.com/sirupsen/logrus"
 	"log"
 )
 
@@ -24,8 +26,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	if err := apiserver.Start(config); err != nil {
-		log.Fatal(err)
+	logger := logrus.New()
+	logger.SetLevel(logrus.InfoLevel)
+	natsConn, err := nats.NewNatsConnect(config, logger, "publisher")
+	if err != nil {
+		logger.Fatalf("NewNatsConnect: %+v", err)
 	}
+	ps := producer.NewProducerServer(logger, config, natsConn)
+
+	logger.Error(ps.Run())
 }
