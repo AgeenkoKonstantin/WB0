@@ -11,20 +11,20 @@ var (
 
 type Cache struct {
 	mutex sync.RWMutex
-	data  map[string]string
+	Data  map[string]string
 }
 
 func (cache *Cache) Get(uid string) (string, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
-	if order, ok := cache.data[uid]; ok {
+	if order, ok := cache.Data[uid]; ok {
 		return order, nil
 	}
 	return "", ErrNotFoundInCache
 }
 
-func (cache *Cache) Add(uid string, order string) {
+func (cache *Cache) Put(uid string, order string) {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
-	cache.data[uid] = order
+	cache.Data[uid] = order
 }

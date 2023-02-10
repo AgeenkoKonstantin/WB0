@@ -35,4 +35,5 @@ func main() {
 	ps := producer.NewProducerServer(logger, config, natsConn)
 
 	logger.Error(ps.Run())
+	
 }

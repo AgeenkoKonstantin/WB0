@@ -7,6 +7,7 @@ type Config struct {
 	DatabaseURL   string `toml:"database_url"`
 	NatsClusterId string `toml:"nats_cluster_id"`
 	NatsHostname  string `toml:"nats_hostname"`
+	DbDriverName  string `toml:"db_driver_name"`
 }
 
 // NewConfig ...
