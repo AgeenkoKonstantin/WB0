@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"WB0/internal/apiserver/orderservice"
+	"context"
 	"encoding/json"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -13,13 +14,15 @@ type httpServer struct {
 	router  *mux.Router
 	logger  *logrus.Logger
 	service *orderservice.OrderService
+	ctx     context.Context
 }
 
-func newHttpServer(logger *logrus.Logger, service *orderservice.OrderService) *httpServer {
+func newHttpServer(logger *logrus.Logger, service *orderservice.OrderService, ctx context.Context) *httpServer {
 	s := &httpServer{
 		router:  mux.NewRouter(),
 		logger:  logger,
 		service: service,
+		ctx:     ctx,
 	}
 
 	s.configureRouter()
@@ -40,9 +43,8 @@ func (s *httpServer) configureRouter() {
 func (s *httpServer) GetOrderByUID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uid := vars["id"]
-	response, err := s.service.GetByUid(uid)
+	response, err := s.service.GetByUid(s.ctx, uid)
 	if err != nil {
-		s.logger.Info(err)
 		respondWithError(w, http.StatusInternalServerError, "failed to find order with given uid")
 	} else {
 		respondWithJSON(w, http.StatusOK, response)
@@ -67,6 +69,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
+
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

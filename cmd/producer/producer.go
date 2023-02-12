@@ -30,10 +30,12 @@ func main() {
 	logger.SetLevel(logrus.InfoLevel)
 	natsConn, err := nats.NewNatsConnect(config, logger, "publisher")
 	if err != nil {
-		logger.Fatalf("NewNatsConnect: %+v", err)
+		logger.Fatalf("failed to connect to nats server: %+v", err)
 	}
 	ps := producer.NewProducerServer(logger, config, natsConn)
 
-	logger.Error(ps.Run())
-	
+	if err := ps.Run(); err != nil {
+		log.Fatalf("failed to start producer server: %+v", err)
+	}
+
 }

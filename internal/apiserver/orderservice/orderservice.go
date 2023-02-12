@@ -3,7 +3,7 @@ package orderservice
 import (
 	"WB0/internal/apiserver/repository"
 	"WB0/internal/models"
-	"database/sql"
+	"context"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,15 +13,17 @@ type OrderService struct {
 	logger          *logrus.Logger
 }
 
-func NewOrderService(db *sql.DB, logger *logrus.Logger) *OrderService {
+func NewOrderService(cacheRepository *repository.CacheRepository,
+	sqlRepository *repository.SqlRepository,
+	logger *logrus.Logger) *OrderService {
 	return &OrderService{
-		cacheRepository: repository.NewCacheRepository(),
-		sqlRepository:   repository.NewSqlRepository(db),
+		cacheRepository: cacheRepository,
+		sqlRepository:   sqlRepository,
 		logger:          logger,
 	}
 }
 
-func (s *OrderService) GetByUid(orderUid string) (*models.Order, error) {
+func (s *OrderService) GetByUid(ctx context.Context, orderUid string) (*models.Order, error) {
 	var (
 		order *models.Order
 		err   error
@@ -34,7 +36,7 @@ func (s *OrderService) GetByUid(orderUid string) (*models.Order, error) {
 			return order, nil
 		}
 	}
-	order, err = s.sqlRepository.GetById(orderUid)
+	order, err = s.sqlRepository.GetById(ctx, orderUid)
 	if err != nil {
 		s.logger.Info(err)
 		return nil, err
@@ -42,4 +44,13 @@ func (s *OrderService) GetByUid(orderUid string) (*models.Order, error) {
 		s.cacheRepository.Put(orderUid, order)
 		return order, nil
 	}
+}
+
+func (s *OrderService) SaveOrder(model *models.Order, ctx context.Context) error {
+
+	err := s.sqlRepository.SaveOrder(ctx, model)
+	if err != nil {
+		s.logger.Info(err)
+	}
+	return err
 }

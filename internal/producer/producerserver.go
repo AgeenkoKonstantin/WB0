@@ -2,6 +2,7 @@ package producer
 
 import (
 	"WB0/internal/config"
+	"WB0/internal/producer/nats"
 	"context"
 	"github.com/nats-io/stan.go"
 	"github.com/sirupsen/logrus"
@@ -33,7 +34,7 @@ func (ps *producerServer) Run() error {
 	defer cancel()
 
 	go func() {
-		producer := newProducer(ps.natsConn, ps.logger)
+		producer := nats.NewProducer(ps.natsConn, ps.logger)
 		producer.Run()
 	}()
 

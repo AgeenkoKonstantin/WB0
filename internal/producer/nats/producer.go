@@ -1,4 +1,4 @@
-package producer
+package nats
 
 import (
 	"WB0/internal/models"
@@ -16,7 +16,7 @@ type producer struct {
 	logger   *logrus.Logger
 }
 
-func newProducer(stanConn stan.Conn, logger *logrus.Logger) *producer {
+func NewProducer(stanConn stan.Conn, logger *logrus.Logger) *producer {
 	return &producer{
 		stanConn: stanConn,
 		logger:   logger,
