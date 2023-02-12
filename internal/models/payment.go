@@ -1,8 +1,8 @@
 package models
 
 type Payment struct {
-	Transaction  string `json:"transaction" faker:"len=14"`
-	RequestId    string `json:"request_id" faker:"len=20"`
+	Transaction  string `json:"transaction" faker:"len=13"`
+	RequestId    string `json:"request_id" faker:"len=19"`
 	Currency     string `json:"currency" faker:"currency"`
 	Provider     string `json:"provider" faker:"oneof: cc, paypal, check, money order"`
 	Amount       int    `json:"amount" faker:"boundary_start=1, boundary_end=1000"`

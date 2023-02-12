@@ -31,14 +31,14 @@ func (s *OrderService) GetByUid(ctx context.Context, orderUid string) (*models.O
 	if !s.cacheRepository.IsEmpty() {
 		order, err = s.cacheRepository.GetById(orderUid)
 		if err != nil {
-			s.logger.Info(err)
+			s.logger.Infof("OrderService.GetByUid error while get order from cache: %+v", err)
 		} else {
 			return order, nil
 		}
 	}
 	order, err = s.sqlRepository.GetById(ctx, orderUid)
 	if err != nil {
-		s.logger.Info(err)
+		s.logger.Infof("OrderService.GetByUid error while get order from DB: %+v", err)
 		return nil, err
 	} else {
 		s.cacheRepository.Put(orderUid, order)
@@ -47,10 +47,9 @@ func (s *OrderService) GetByUid(ctx context.Context, orderUid string) (*models.O
 }
 
 func (s *OrderService) SaveOrder(model *models.Order, ctx context.Context) error {
-
 	err := s.sqlRepository.SaveOrder(ctx, model)
 	if err != nil {
-		s.logger.Info(err)
+		s.logger.Infof("OrderService.SaveOrder error : %+v", err)
 	}
 	return err
 }

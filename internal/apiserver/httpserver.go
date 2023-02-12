@@ -36,8 +36,12 @@ func (s *httpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *httpServer) configureRouter() {
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
-	s.router.HandleFunc("/test/{id}", s.testGET).Methods("GET")
 	s.router.HandleFunc("/orders/{id}", s.GetOrderByUID).Methods("GET")
+	s.router.HandleFunc("/", s.HandleStart).Methods("GET")
+}
+
+func (s *httpServer) HandleStart(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/index.html")
 }
 
 func (s *httpServer) GetOrderByUID(w http.ResponseWriter, r *http.Request) {
@@ -49,18 +53,6 @@ func (s *httpServer) GetOrderByUID(w http.ResponseWriter, r *http.Request) {
 	} else {
 		respondWithJSON(w, http.StatusOK, response)
 	}
-}
-
-func (s *httpServer) testGET(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	type resp struct {
-		ID string `json:"id"`
-	}
-	response := &resp{
-		ID: id,
-	}
-	respondWithJSON(w, http.StatusOK, response)
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {

@@ -2,9 +2,9 @@ package models
 
 type Item struct {
 	ChrtId      int    `json:"chrt_id"`
-	TrackNumber string `json:"track_number" faker:"len=14"`
+	TrackNumber string `json:"track_number" faker:"len=13"`
 	Price       int    `json:"price" faker:"boundary_start=50, boundary_end=10000"`
-	Rid         string `json:"rid" faker:"len=21"`
+	Rid         string `json:"rid" faker:"len=20"`
 	Name        string `json:"name" faker:"name"`
 	Sale        int    `json:"sale" faker:"boundary_start=0, boundary_end=99"`
 	Size        string `json:"size" faker:"oneof: 0, 1, 2, 3, 4, 5, 6"`

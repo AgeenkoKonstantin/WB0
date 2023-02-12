@@ -30,7 +30,7 @@ func NewSubscriber(logger *logrus.Logger, stanConn stan.Conn, service *orderserv
 }
 
 func (s *Subscriber) Subscribe(subject, qgroup string, workerNum int, cb stan.MsgHandler) {
-	s.logger.Printf("Subscribing to Subject: %v, group: %v", subject, qgroup)
+	s.logger.Infof("Subscribing to Subject: %v, qgroup: %v", subject, qgroup)
 	wg := &sync.WaitGroup{}
 
 	for i := 0; i < workerNum; i++ {
@@ -42,6 +42,7 @@ func (s *Subscriber) Subscribe(subject, qgroup string, workerNum int, cb stan.Ms
 			subject,
 			qgroup,
 			cb,
+			stan.DurableName("order-subs-durable"),
 		)
 	}
 	wg.Wait()
@@ -56,21 +57,21 @@ func (s *Subscriber) runWorker(
 	cb stan.MsgHandler,
 	opts ...stan.SubscriptionOption,
 ) {
-	s.logger.Printf("Subscribing worker: %v, subject: %v, qgroup: %v", workerID, subject, qgroup)
+	s.logger.Infof("Subscribing worker: %v, subject: %v, qgroup: %v", workerID, subject, qgroup)
 	defer wg.Done()
 
 	_, err := conn.QueueSubscribe(subject, qgroup, cb, opts...)
 	if err != nil {
-		s.logger.Printf("WorkerID: %v, QueueSubscribe: %v", workerID, err)
+		s.logger.Infof("WorkerID: %v, QueueSubscribe: %v", workerID, err)
 		if err := conn.Close(); err != nil {
-			s.logger.Printf("WorkerID: %v, conn.Close error: %v", workerID, err)
+			s.logger.Infof("WorkerID: %v, conn.Close error: %v", workerID, err)
 		}
 	}
 
 }
 
 func (s *Subscriber) Run(ctx context.Context) {
-	go s.Subscribe("order:create", "subscriber", workersNum, s.processCreateOrder(ctx))
+	go s.Subscribe("ordersChannel", "subscriber", workersNum, s.processCreateOrder(ctx))
 }
 
 func (s *Subscriber) processCreateOrder(ctx context.Context) stan.MsgHandler {
